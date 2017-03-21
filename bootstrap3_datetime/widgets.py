@@ -56,7 +56,7 @@ class DateTimePicker(DateTimeInput):
 
     # http://momentjs.com/docs/#/parsing/string-format/
     # http://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
-    format_map = (('DDD', r'%j'),
+    FORMAT_MAP = (('DDD', r'%j'),
                   ('DD', r'%d'),
                   ('MMMM', r'%B'),
                   ('MMM', r'%b'),
@@ -73,13 +73,13 @@ class DateTimePicker(DateTimeInput):
 
     @classmethod
     def conv_datetime_format_py2js(cls, format):
-        for js, py in cls.format_map:
+        for js, py in cls.FORMAT_MAP:
             format = format.replace(py, js)
         return format
 
     @classmethod
     def conv_datetime_format_js2py(cls, format):
-        for js, py in cls.format_map:
+        for js, py in cls.FORMAT_MAP:
             format = format.replace(js, py)
         return format
 

@@ -19,6 +19,8 @@ class DateTimePicker(DateTimeInput):
     class Media:
         class JsFiles(object):
             def __iter__(self):
+                yield 'https://code.jquery.com/jquery-2.2.4.min.js'
+                yield 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'
                 yield 'bootstrap3_datetime/js/moment.min.js'
                 yield 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js'
                 lang = translation.get_language()
@@ -48,7 +50,9 @@ class DateTimePicker(DateTimeInput):
                         yield 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.%s.js' % (lang)
 
         js = JsFiles()
-        css = {'all': ('bootstrap3_datetime/css/bootstrap-datetimepicker.min.css',), }
+        css = {'all': ('bootstrap3_datetime/css/bootstrap-datetimepicker.min.css',
+                       'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css',
+                       'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css')}
 
     # http://momentjs.com/docs/#/parsing/string-format/
     # http://docs.python.org/2/library/datetime.html#strftime-strptime-behavior

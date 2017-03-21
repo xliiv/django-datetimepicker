@@ -161,22 +161,24 @@ class DateTimePicker(DateTimeInput):
 
         super(DateTimePicker, self).__init__(attrs, format)
 
-    def render(self, name, value, attrs=None):
+
+    def render(self, name, value, attrs=None, prefix='bootstrap3'):
+
         if value is None:
             value = ''
+
         input_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+
         if value != '':
-            # Only add the 'value' attribute if a value is non-empty.
-            input_attrs['value'] = force_text(self._format_value(value))
-        input_attrs = dict([(key, conditional_escape(val)) for key, val in input_attrs.items()])  # python2.6 compatible
-        if not self.picker_id:
-             self.picker_id = (input_attrs.get('id', '') +
-                               '_pickers').replace(' ', '_')
-        self.div_attrs['id'] = self.picker_id
-        picker_id = conditional_escape(self.picker_id)
-        div_attrs = dict(
-            [(key, conditional_escape(val)) for key, val in self.div_attrs.items()])  # python2.6 compatible
-        icon_attrs = dict([(key, conditional_escape(val)) for key, val in self.icon_attrs.items()])
+            input_attrs.update({'value': force_text(self._format_value(value))})
+
+        self.div_attrs.update({
+            'id': '{prefix}_{field_id}'.format(
+                prefix=prefix,
+                field_id=input_attrs.get('id'),
+            )
+        })
+
         html = render_to_string(
             'bootstrap3_datetime/div.html',
             context={'div_attrs': flatatt(self.div_attrs),

@@ -1,3 +1,6 @@
 from django.conf.urls import url
 
-urlpatterns = []
+from .views import SampleView
+
+
+urlpatterns = [url(r'^', SampleView.as_view())]

@@ -86,20 +86,6 @@ class DateTimePicker(DateTimeInput):
             format = format.replace(js, py)
         return format
 
-    js_template = '''
-        <script>
-            (function(window) {
-                var callback = function() {
-                    $(function(){$("#%(picker_id)s:has(input:not([readonly],[disabled]))").datetimepicker(%(options)s);});
-                };
-                if(window.addEventListener)
-                    window.addEventListener("load", callback, false);
-                else if (window.attachEvent)
-                    window.attachEvent("onload", callback);
-                else window.onload = callback;
-            })(window);
-        </script>'''
-
     def __init__(self,
                  attrs={},
                  format=None,
@@ -185,10 +171,22 @@ class DateTimePicker(DateTimeInput):
                      'input_attrs': flatatt(input_attrs),
                      'icon_attrs': flatatt(self.icon_attrs)}
         )
-        if self.options:
-            self.options['language'] = translation.get_language()
-            js = self.js_template % dict(picker_id=picker_id,
-                                         options=json.dumps(self.options or {}))
-        else:
-            js = ''
-        return mark_safe(force_text(html + js))
+
+        # generate a json object out of the options
+        dump = json.dumps({
+                    **{key: val
+                       for key, val in self.options.items()
+                       if key != 'format'},
+                    'format': self.conv_datetime_format_py2js(
+                        self.options.get('format')
+                    )
+                })
+
+        js = render_to_string(
+            'bootstrap3_datetime/script.html',
+            context={
+                'div_attrs': self.div_attrs,
+                'options': dump,
+            }
+        )
+        return html + js

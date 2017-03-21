@@ -1,3 +1,6 @@
+import warnings
+
+from django.conf import settings
 from django.forms.utils import flatatt
 from django.forms.widgets import DateTimeInput
 from django.template.loader import render_to_string
@@ -97,25 +100,66 @@ class DateTimePicker(DateTimeInput):
             })(window);
         </script>'''
 
-    def __init__(self, attrs=None, format=None, options=None, div_attrs=None, icon_attrs=None):
-        if not icon_attrs:
-            icon_attrs = {'class': 'glyphicon glyphicon-calendar'}
-        if not div_attrs:
-            div_attrs = {'class': 'input-group date'}
-        if format is None and options and options.get('format'):
-            format = self.conv_datetime_format_js2py(options.get('format'))
-        super(DateTimePicker, self).__init__(attrs, format)
-        if 'class' not in self.attrs:
-            self.attrs['class'] = 'form-control'
-        self.div_attrs = div_attrs and div_attrs.copy() or {}
-        self.icon_attrs = icon_attrs and icon_attrs.copy() or {}
-        self.picker_id = self.div_attrs.get('id') or None
-        if options == False:  # datetimepicker will not be initalized only when options is False
-            self.options = False
+    def __init__(self,
+                 attrs={},
+                 format=None,
+                 options={},
+                 div_attrs={},
+                 icon_attrs={}):
+
+        # copy the dicts to avoid overriding the attribute dict
+        attrs = attrs.copy()
+        options = options.copy()
+        div_attrs = div_attrs.copy()
+        icon_attrs = icon_attrs.copy()
+
+        # if datetime is given, convert the format to a python valid format
+        datetime = attrs.get('datetime')
+        if datetime is not None:
+            datetime = self.conv_datetime_format_js2py(attrs.get('datetime'))
+
+        # 3 possible ways to set the format
+        formats = set([datetime,
+                       format,
+                       options.get('format')]) - {None}
+
+        # extract the format
+        if len(formats) is 0:
+            format = getattr(settings, self.format_key)[0]
+        elif len(formats) is 1:
+            format = formats.pop()
         else:
-            self.options = options and options.copy() or {}
-            if format and not self.options.get('format') and not self.attrs.get('date-format'):
-                self.options['format'] = self.conv_datetime_format_py2js(format)
+            warnings.wart('format is set more than once', UserWarning)
+        
+        attrs.update({'class': ' '.join(
+            set(attrs.get('class', '').split(' ') + ['form-control'])
+        )})
+
+        div_attrs.update({'class': ' '.join(
+            set(div_attrs.get('class', '').split(' ') + ['input-group', 'date'])
+        )})
+
+        classes = 'glyphicon glyphicon-calendar'
+        if not options.get('pickDate', True):
+            classes = 'glyphicon glyphicon-time'
+
+
+        icon_attrs.update({
+            'class': icon_attrs.get('class', classes)
+        })
+
+        # make sure 'format' is set in the options, the if clause is used just
+        # in case the format is set in the options and the attributes, but not
+        # as the 'format' keyword argument
+        if format:
+            options.update({'format': format})
+        options.update({'language': translation.get_language()})
+
+        self.options = options
+        self.div_attrs = div_attrs
+        self.icon_attrs = icon_attrs
+
+        super(DateTimePicker, self).__init__(attrs, format)
 
     def render(self, name, value, attrs=None):
         if value is None:
@@ -135,9 +179,9 @@ class DateTimePicker(DateTimeInput):
         icon_attrs = dict([(key, conditional_escape(val)) for key, val in self.icon_attrs.items()])
         html = render_to_string(
             'bootstrap3_datetime/div.html',
-            context={'div_attrs': flatatt(div_attrs),
+            context={'div_attrs': flatatt(self.div_attrs),
                      'input_attrs': flatatt(input_attrs),
-                     'icon_attrs': flatatt(icon_attrs)}
+                     'icon_attrs': flatatt(self.icon_attrs)}
         )
         if self.options:
             self.options['language'] = translation.get_language()

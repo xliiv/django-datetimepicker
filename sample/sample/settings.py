@@ -18,6 +18,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # bootstrap app
+    'bootstrap3_datetime',
+    # sample project!
+    'sample',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

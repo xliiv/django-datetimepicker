@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
 from django.forms.utils import flatatt
 from django.forms.widgets import DateTimeInput
+from django.template.loader import render_to_string
 from django.utils import translation
 from django.utils.safestring import mark_safe
 from django.utils.html import conditional_escape
@@ -83,14 +83,6 @@ class DateTimePicker(DateTimeInput):
             format = format.replace(js, py)
         return format
 
-    html_template = '''
-        <div%(div_attrs)s>
-            <input%(input_attrs)s/>
-            <span class="input-group-addon">
-                <span%(icon_attrs)s></span>
-            </span>
-        </div>'''
-
     js_template = '''
         <script>
             (function(window) {
@@ -141,9 +133,12 @@ class DateTimePicker(DateTimeInput):
         div_attrs = dict(
             [(key, conditional_escape(val)) for key, val in self.div_attrs.items()])  # python2.6 compatible
         icon_attrs = dict([(key, conditional_escape(val)) for key, val in self.icon_attrs.items()])
-        html = self.html_template % dict(div_attrs=flatatt(div_attrs),
-                                         input_attrs=flatatt(input_attrs),
-                                         icon_attrs=flatatt(icon_attrs))
+        html = render_to_string(
+            'bootstrap3_datetime/div.html',
+            context={'div_attrs': flatatt(div_attrs),
+                     'input_attrs': flatatt(input_attrs),
+                     'icon_attrs': flatatt(icon_attrs)}
+        )
         if self.options:
             self.options['language'] = translation.get_language()
             js = self.js_template % dict(picker_id=picker_id,

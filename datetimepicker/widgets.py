@@ -39,7 +39,7 @@ class DateTimePicker(DateTimeInput):
 
     def __init__(self,
                  attrs={},
-                 format=None,
+                 format_string=None,  # falsy is not enough, None required (*)
                  options={},
                  div_attrs={},
                  icon_attrs={}):
@@ -50,19 +50,19 @@ class DateTimePicker(DateTimeInput):
         div_attrs = div_attrs.copy()
         icon_attrs = icon_attrs.copy()
 
-        # if datetime is given, convert the format to a python valid format
+        # the attribute's datetime is set in js format
+        # if it is set, we need to convert it to a valid python format
         datetime = attrs.get('datetime')
 
-        # 3 possible ways to set the format
+        # get the set of given formats
         formats = set([datetime and _js_datetime_format_to_py(datetime) or None,
-                       format,
-                       options.get('format')]) - {None}
+                       format_string,         
+                       options.get('format')]) - {None}  # and this is why (*)
 
-        # extract the format
         if len(formats) is 0:
-            format = getattr(settings, self.format_key)[0]
+            format_string = getattr(settings, self.format_key)[0]
         elif len(formats) is 1:
-            format = formats.pop()
+            format_string = formats.pop()
         else:
             warnings.warn('format is set more than once', UserWarning)
         
@@ -86,15 +86,15 @@ class DateTimePicker(DateTimeInput):
         # make sure 'format' is set in the options, the if clause is used just
         # in case the format is set in the options and the attributes, but not
         # as the 'format' keyword argument
-        if format:
-            options.update({'format': format})
+        if format_string:
+            options.update({'format': format_string})
         options.update({'language': translation.get_language()})
 
         self.options = options
         self.div_attrs = div_attrs
         self.icon_attrs = icon_attrs
 
-        super(DateTimePicker, self).__init__(attrs, format)
+        super(DateTimePicker, self).__init__(attrs, format_string)
 
 
     def render(self, name, value, attrs=None, prefix='bootstrap3'):

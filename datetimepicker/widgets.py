@@ -1,3 +1,4 @@
+import json
 import warnings
 
 from django.conf import settings
@@ -8,14 +9,6 @@ from django.utils import translation
 from django.utils.safestring import mark_safe
 from django.utils.html import conditional_escape
 
-try:
-    import json
-except ImportError:
-    from django.utils import simplejson as json
-try:
-    from django.utils.encoding import force_unicode as force_text
-except ImportError:  # python3
-    from django.utils.encoding import force_text
 
 
 class DateTimePicker(DateTimeInput):

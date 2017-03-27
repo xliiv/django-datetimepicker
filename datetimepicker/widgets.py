@@ -8,6 +8,7 @@ from django.forms.utils import flatatt
 from django.forms.widgets import DateTimeInput
 from django.template.loader import render_to_string
 from django.utils import translation
+from django.utils.encoding import force_text
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 

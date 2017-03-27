@@ -1,6 +1,8 @@
 import json
 import warnings
 
+from functools import reduce
+
 from django.conf import settings
 from django.forms.utils import flatatt
 from django.forms.widgets import DateTimeInput
@@ -10,37 +12,30 @@ from django.utils.safestring import mark_safe
 from django.utils.html import conditional_escape
 
 
+FORMAT_MAP = {'d': r'%d',
+              'm': r'%m',
+              'Y': r'%Y',
+              'H': r'%H',
+              'i': r'%M'}
+
+
+def _py_datetime_format_to_js(format_string):
+    return (format_string is not None and
+            reduce(lambda format_string, args: format_string.replace(*reversed(args)),
+                  FORMAT_MAP.items(),
+                  format_string) or
+            None)
+
+
+def _js_datetime_format_to_py(format_string):
+    return (format_string is not None and
+            reduce(lambda format_string, args: format_string.replace(*args),
+                  FORMAT_MAP.items(),
+                  format_string) or
+            None)
+
 
 class DateTimePicker(DateTimeInput):
-
-    # http://momentjs.com/docs/#/parsing/string-format/
-    # http://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
-    FORMAT_MAP = (('DDD', r'%j'),
-                  ('DD', r'%d'),
-                  ('MMMM', r'%B'),
-                  ('MMM', r'%b'),
-                  ('MM', r'%m'),
-                  ('YYYY', r'%Y'),
-                  ('YY', r'%y'),
-                  ('HH', r'%H'),
-                  ('hh', r'%I'),
-                  ('mm', r'%M'),
-                  ('ss', r'%S'),
-                  ('a', r'%p'),
-                  ('ZZ', r'%z'),
-    )
-
-    @classmethod
-    def conv_datetime_format_py2js(cls, format):
-        for js, py in cls.FORMAT_MAP:
-            format = format.replace(py, js)
-        return format
-
-    @classmethod
-    def conv_datetime_format_js2py(cls, format):
-        for js, py in cls.FORMAT_MAP:
-            format = format.replace(js, py)
-        return format
 
     def __init__(self,
                  attrs={},
@@ -57,11 +52,9 @@ class DateTimePicker(DateTimeInput):
 
         # if datetime is given, convert the format to a python valid format
         datetime = attrs.get('datetime')
-        if datetime is not None:
-            datetime = self.conv_datetime_format_js2py(attrs.get('datetime'))
 
         # 3 possible ways to set the format
-        formats = set([datetime,
+        formats = set([datetime and _js_datetime_format_to_py(datetime) or None,
                        format,
                        options.get('format')]) - {None}
 
@@ -71,7 +64,7 @@ class DateTimePicker(DateTimeInput):
         elif len(formats) is 1:
             format = formats.pop()
         else:
-            warnings.wart('format is set more than once', UserWarning)
+            warnings.warn('format is set more than once', UserWarning)
         
         attrs.update({'class': ' '.join(
             set(attrs.get('class', '').split(' ') + ['form-control'])
@@ -130,13 +123,11 @@ class DateTimePicker(DateTimeInput):
 
         # generate a json object out of the options
         dump = json.dumps({
-                    **{key: val
-                       for key, val in self.options.items()
-                       if key != 'format'},
-                    'format': self.conv_datetime_format_py2js(
-                        self.options.get('format')
-                    )
-                })
+            **{key: val
+               for key, val in self.options.items()
+               if key != 'format'},
+            'format': _py_datetime_format_to_js(self.options.get('format'))
+        })
 
         js = render_to_string(
             'bootstrap3_datetime/script.html',

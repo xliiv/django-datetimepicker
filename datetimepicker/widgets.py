@@ -129,7 +129,7 @@ class DateTimePicker(DateTimeInput):
         js = render_to_string(
             'datetimepicker/script.html',
             context={
-                'div_attrs': self.div_attrs,
+                'input_attrs': input_attrs,
                 'options': dump,
             }
         )

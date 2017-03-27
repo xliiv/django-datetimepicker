@@ -74,14 +74,11 @@ class DateTimePicker(DateTimeInput):
             set(div_attrs.get('class', '').split(' ') + ['input-group', 'date'])
         )})
 
-        classes = 'glyphicon glyphicon-calendar'
-        if not options.get('pickDate', True):
-            classes = 'glyphicon glyphicon-time'
+        icon_class = 'calendar-icon'
+        if not options.get('datepicker', True):
+            icon_class = 'time-icon'
 
-
-        icon_attrs.update({
-            'class': icon_attrs.get('class', classes)
-        })
+        icon_attrs.update({'class': icon_attrs.get('class', icon_class)})
 
         # make sure 'format' is set in the options, the if clause is used just
         # in case the format is set in the options and the attributes, but not

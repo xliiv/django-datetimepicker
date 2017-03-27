@@ -94,7 +94,7 @@ class DateTimePicker(DateTimeInput):
         super(DateTimePicker, self).__init__(attrs, format_string)
 
 
-    def render(self, name, value, attrs=None, prefix='bootstrap3'):
+    def render(self, name, value, attrs=None, prefix='datetimepicker'):
 
         if value is None:
             value = ''
@@ -112,7 +112,7 @@ class DateTimePicker(DateTimeInput):
         })
 
         html = render_to_string(
-            'bootstrap3_datetime/div.html',
+            'datetimepicker/div.html',
             context={'div_attrs': flatatt(self.div_attrs),
                      'input_attrs': flatatt(input_attrs),
                      'icon_attrs': flatatt(self.icon_attrs)}
@@ -127,7 +127,7 @@ class DateTimePicker(DateTimeInput):
         })
 
         js = render_to_string(
-            'bootstrap3_datetime/script.html',
+            'datetimepicker/script.html',
             context={
                 'div_attrs': self.div_attrs,
                 'options': dump,

@@ -118,19 +118,21 @@ class DateTimePicker(DateTimeInput):
                      'icon_attrs': flatatt(self.icon_attrs)}
         )
 
-        # generate a json object out of the options
-        dump = json.dumps({
+        # a dict represented in json is equivalent to an object in javascript
+        js_options = json.dumps({
             **{key: val
                for key, val in self.options.items()
                if key != 'format'},
             'format': _py_datetime_format_to_js(self.options.get('format'))
         })
+        # wait wait wait... what was that?! keyword arguments magic applied to
+        # a dict comprehension inside a dict with other key values?! is this sparta?
 
         js = render_to_string(
             'datetimepicker/script.html',
             context={
                 'input_attrs': input_attrs,
-                'options': dump,
+                'options': js_options,
             }
         )
         return html + js

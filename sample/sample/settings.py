@@ -19,7 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # bootstrap app
-    'bootstrap3_datetime',
+    'datetimepicker',
     # sample project!
     'sample',
 ]

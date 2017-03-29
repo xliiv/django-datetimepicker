@@ -42,14 +42,12 @@ class DateTimePicker(DateTimeInput):
                  attrs={},
                  format_string=None,  # falsy is not enough, None required (*)
                  options={},
-                 div_attrs={},
-                 icon_attrs={}):
+                 div_attrs={}):
 
         # copy the dicts to avoid overriding the attribute dict
         attrs = attrs.copy()
         options = options.copy()
         div_attrs = div_attrs.copy()
-        icon_attrs = icon_attrs.copy()
 
         # the attribute's datetime is set in js format
         # if it is set, we need to convert it to a valid python format
@@ -66,7 +64,7 @@ class DateTimePicker(DateTimeInput):
             format_string = formats.pop()
         else:
             warnings.warn('format is set more than once', UserWarning)
-        
+
         attrs.update({'class': ' '.join(
             set(attrs.get('class', '').split(' ') + ['form-control'])
         )})
@@ -74,12 +72,6 @@ class DateTimePicker(DateTimeInput):
         div_attrs.update({'class': ' '.join(
             set(div_attrs.get('class', '').split(' ') + ['input-group', 'date'])
         )})
-
-        icon_class = 'calendar-icon'
-        if not options.get('datepicker', True):
-            icon_class = 'time-icon'
-
-        icon_attrs.update({'class': icon_attrs.get('class', icon_class)})
 
         # make sure 'format' is set in the options, the if clause is used just
         # in case the format is set in the options and the attributes, but not
@@ -90,10 +82,8 @@ class DateTimePicker(DateTimeInput):
 
         self.options = options
         self.div_attrs = div_attrs
-        self.icon_attrs = icon_attrs
 
         super(DateTimePicker, self).__init__(attrs, format_string)
-
 
     def render(self, name, value, attrs=None, prefix='datetimepicker'):
 
@@ -115,8 +105,7 @@ class DateTimePicker(DateTimeInput):
         html = render_to_string(
             'datetimepicker/div.html',
             context={'div_attrs': flatatt(self.div_attrs),
-                     'input_attrs': flatatt(input_attrs),
-                     'icon_attrs': flatatt(self.icon_attrs)}
+                     'input_attrs': flatatt(input_attrs)}
         )
 
         # a dict represented in json is equivalent to an object in javascript

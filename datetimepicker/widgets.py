@@ -109,12 +109,12 @@ class DateTimePicker(DateTimeInput):
         )
 
         # a dict represented in json is equivalent to an object in javascript
-        js_options = json.dumps({
+        js_options = json.dumps(dict(
+            format=_py_datetime_format_to_js(self.options.get('format')),
             **{key: val
                for key, val in self.options.items()
-               if key != 'format'},
-            'format': _py_datetime_format_to_js(self.options.get('format'))
-        })
+               if key != 'format'}
+        ))
         # wait wait wait... what was that?! keyword arguments magic applied to
         # a dict comprehension inside a dict with other key values?! is this sparta?
 

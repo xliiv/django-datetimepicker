@@ -19,19 +19,25 @@ FORMAT_MAP = {'d': r'%d',
 
 
 def _py_datetime_format_to_js(format_string):
-    return (format_string is not None and
-            reduce(lambda format_string, args: format_string.replace(*reversed(args)),
-                  FORMAT_MAP.items(),
-                  format_string) or
-            None)
+    return (
+        format_string is not None and
+        reduce(
+            lambda format_string, args: format_string.replace(*reversed(args)),
+            FORMAT_MAP.items(),
+            format_string
+        ) or
+        None
+    )
 
 
 def _js_datetime_format_to_py(format_string):
-    return (format_string is not None and
-            reduce(lambda format_string, args: format_string.replace(*args),
-                  FORMAT_MAP.items(),
-                  format_string) or
-            None)
+    return (
+        format_string is not None and
+        reduce(lambda format_string, args: format_string.replace(*args),
+               FORMAT_MAP.items(),
+               format_string) or
+        None
+    )
 
 
 class DateTimePicker(DateTimeInput):
@@ -52,9 +58,11 @@ class DateTimePicker(DateTimeInput):
         datetime = attrs.get('datetime')
 
         # get the set of given formats
-        formats = set([datetime and _js_datetime_format_to_py(datetime) or None,
-                       format_string,         
-                       options.get('format')]) - {None}  # and this is why (*)
+        formats = {
+            datetime and _js_datetime_format_to_py(datetime) or None,
+            format_string,
+            options.get('format')
+        } - {None}  # and this is why (*)
 
         if len(formats) is 0:
             format_string = getattr(settings, self.format_key)[0]
@@ -67,9 +75,9 @@ class DateTimePicker(DateTimeInput):
             set(attrs.get('class', '').split(' ') + ['form-control'])
         )})
 
-        div_attrs.update({'class': ' '.join(
-            set(div_attrs.get('class', '').split(' ') + ['input-group', 'date'])
-        )})
+        div_attrs.update({'class': ' '.join(set(
+            div_attrs.get('class', '').split(' ') + ['input-group', 'date']
+        ))})
 
         # make sure 'format' is set in the options, the if clause is used just
         # in case the format is set in the options and the attributes, but not
@@ -91,7 +99,9 @@ class DateTimePicker(DateTimeInput):
         input_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
 
         if value != '':
-            input_attrs.update({'value': force_text(self._format_value(value))})
+            input_attrs.update({
+                'value': force_text(self._format_value(value))
+            })
 
         self.div_attrs.update({
             'id': '{prefix}_{field_id}'.format(

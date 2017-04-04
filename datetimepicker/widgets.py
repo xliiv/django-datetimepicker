@@ -9,8 +9,6 @@ from django.forms.widgets import DateTimeInput
 from django.template.loader import render_to_string
 from django.utils import translation
 from django.utils.encoding import force_text
-from django.utils.html import conditional_escape
-from django.utils.safestring import mark_safe
 
 
 FORMAT_MAP = {'d': r'%d',
@@ -21,19 +19,25 @@ FORMAT_MAP = {'d': r'%d',
 
 
 def _py_datetime_format_to_js(format_string):
-    return (format_string is not None and
-            reduce(lambda format_string, args: format_string.replace(*reversed(args)),
-                  FORMAT_MAP.items(),
-                  format_string) or
-            None)
+    return (
+        format_string is not None and
+        reduce(
+            lambda format_string, args: format_string.replace(*reversed(args)),
+            FORMAT_MAP.items(),
+            format_string
+        ) or
+        None
+    )
 
 
 def _js_datetime_format_to_py(format_string):
-    return (format_string is not None and
-            reduce(lambda format_string, args: format_string.replace(*args),
-                  FORMAT_MAP.items(),
-                  format_string) or
-            None)
+    return (
+        format_string is not None and
+        reduce(lambda format_string, args: format_string.replace(*args),
+               FORMAT_MAP.items(),
+               format_string) or
+        None
+    )
 
 
 class DateTimePicker(DateTimeInput):
@@ -42,7 +46,8 @@ class DateTimePicker(DateTimeInput):
                  attrs={},
                  format_string=None,  # falsy is not enough, None required (*)
                  options={},
-                 div_attrs={}):
+                 div_attrs={},
+                 script_tag=True):
 
         # copy the dicts to avoid overriding the attribute dict
         attrs = attrs.copy()
@@ -54,9 +59,11 @@ class DateTimePicker(DateTimeInput):
         datetime = attrs.get('datetime')
 
         # get the set of given formats
-        formats = set([datetime and _js_datetime_format_to_py(datetime) or None,
-                       format_string,         
-                       options.get('format')]) - {None}  # and this is why (*)
+        formats = {
+            datetime and _js_datetime_format_to_py(datetime) or None,
+            format_string,
+            options.get('format')
+        } - {None}  # and this is why (*)
 
         if len(formats) is 0:
             format_string = getattr(settings, self.format_key)[0]
@@ -69,9 +76,9 @@ class DateTimePicker(DateTimeInput):
             set(attrs.get('class', '').split(' ') + ['form-control'])
         )})
 
-        div_attrs.update({'class': ' '.join(
-            set(div_attrs.get('class', '').split(' ') + ['input-group', 'date'])
-        )})
+        div_attrs.update({'class': ' '.join(set(
+            div_attrs.get('class', '').split(' ') + ['input-group', 'date']
+        ))})
 
         # make sure 'format' is set in the options, the if clause is used just
         # in case the format is set in the options and the attributes, but not
@@ -82,6 +89,7 @@ class DateTimePicker(DateTimeInput):
 
         self.options = options
         self.div_attrs = div_attrs
+        self.use_script_tag = script_tag
 
         super(DateTimePicker, self).__init__(attrs, format_string)
 
@@ -93,7 +101,9 @@ class DateTimePicker(DateTimeInput):
         input_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
 
         if value != '':
-            input_attrs.update({'value': force_text(self._format_value(value))})
+            input_attrs.update({
+                'value': force_text(self._format_value(value))
+            })
 
         self.div_attrs.update({
             'id': '{prefix}_{field_id}'.format(
@@ -102,30 +112,30 @@ class DateTimePicker(DateTimeInput):
             )
         })
 
-        html = render_to_string(
+        rendered = render_to_string(
             'datetimepicker/div.html',
             context={'div_attrs': flatatt(self.div_attrs),
                      'input_attrs': flatatt(input_attrs)}
         )
 
-        # a dict represented in json is equivalent to an object in javascript
-        js_options = json.dumps(dict(
-            format=_py_datetime_format_to_js(self.options.get('format')),
-            **{key: val
-               for key, val in self.options.items()
-               if key != 'format'}
-        ))
-        # wait wait wait... what was that?! keyword arguments magic applied to
-        # a dict comprehension inside a dict with other key values?! is this sparta?
+        if self.use_script_tag:
+            # a dict represented in json is equivalent to an object in javascript
+            js_options = json.dumps(dict(
+                format=_py_datetime_format_to_js(self.options.get('format')),
+                **{key: val
+                   for key, val in self.options.items()
+                   if key != 'format'}
+            ))
+            js = render_to_string(
+                'datetimepicker/script.html',
+                context={
+                    'input_attrs': input_attrs,
+                    'options': js_options,
+                }
+            )
+            rendered += js
 
-        js = render_to_string(
-            'datetimepicker/script.html',
-            context={
-                'input_attrs': input_attrs,
-                'options': js_options,
-            }
-        )
-        return html + js
+        return rendered
 
     class Media:
         js = ('datetimepicker/vendor/js/jquery.min.js',

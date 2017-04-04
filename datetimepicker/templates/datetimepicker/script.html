@@ -1,5 +1,1 @@
-<script>(function () {
-	$(document).ready(function() {
-		$("#{{ input_attrs.id }}").datetimepicker({{ options|safe }});
-	});
-})(jQuery);</script>
+<script>{% include 'datetimepicker/loader.js' with input_id=input_attrs.id options=options %}</script>

@@ -46,7 +46,8 @@ class DateTimePicker(DateTimeInput):
                  attrs={},
                  format_string=None,  # falsy is not enough, None required (*)
                  options={},
-                 div_attrs={}):
+                 div_attrs={},
+                 script_tag=True):
 
         # copy the dicts to avoid overriding the attribute dict
         attrs = attrs.copy()
@@ -88,6 +89,7 @@ class DateTimePicker(DateTimeInput):
 
         self.options = options
         self.div_attrs = div_attrs
+        self.use_script_tag = script_tag
 
         super(DateTimePicker, self).__init__(attrs, format_string)
 
@@ -110,30 +112,30 @@ class DateTimePicker(DateTimeInput):
             )
         })
 
-        html = render_to_string(
+        rendered = render_to_string(
             'datetimepicker/div.html',
             context={'div_attrs': flatatt(self.div_attrs),
                      'input_attrs': flatatt(input_attrs)}
         )
 
-        # a dict represented in json is equivalent to an object in javascript
-        js_options = json.dumps(dict(
-            format=_py_datetime_format_to_js(self.options.get('format')),
-            **{key: val
-               for key, val in self.options.items()
-               if key != 'format'}
-        ))
-        # wait wait wait... what was that?! keyword arguments magic applied to
-        # a dict comprehension inside a dict with other key values?! is this sparta?
+        if self.use_script_tag:
+            # a dict represented in json is equivalent to an object in javascript
+            js_options = json.dumps(dict(
+                format=_py_datetime_format_to_js(self.options.get('format')),
+                **{key: val
+                   for key, val in self.options.items()
+                   if key != 'format'}
+            ))
+            js = render_to_string(
+                'datetimepicker/script.html',
+                context={
+                    'input_attrs': input_attrs,
+                    'options': js_options,
+                }
+            )
+            rendered += js
 
-        js = render_to_string(
-            'datetimepicker/script.html',
-            context={
-                'input_attrs': input_attrs,
-                'options': js_options,
-            }
-        )
-        return html + js
+        return rendered
 
     class Media:
         js = ('datetimepicker/vendor/js/jquery.min.js',

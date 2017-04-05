@@ -1,5 +1,10 @@
 from setuptools import setup
 
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except (IOError, ImportError):
+    long_description = open('README.md').read()
 
 setup(
     name='django-datetimepicker',
@@ -8,9 +13,9 @@ setup(
                                      'static/datetimepicker/js/*.js',
                                      'static/datetimepicker/vendor/js/jquery.min.js']},
     include_package_data=True,
-    version='2.3.1',
+    version='3.0',
     description='Datetimepicker for Django projects.',
-    long_description=open('README.rst').read(),
+    long_description=long_description,
     author='Pablo Escodebar',
     author_email='escodebar@gmail.com',
     url='https://github.com/escodebar/django-datetimepicker.git',
@@ -19,7 +24,6 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries',

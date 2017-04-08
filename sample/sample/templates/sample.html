@@ -8,9 +8,21 @@
 		      content="Escodebar">
 		<title>Sample</title>
 		{{ form.media }}
+
+		<style>
+			h1, label { font-family: sans-serif; }
+			label { clear: both;
+				display: inline-block;
+				float: left;
+				width: 300px; }
+			input, label { line-height: 1.5em; }
+			.date { height: 2.5em; }
+		</style>
 	</head>
 
 	<body>
+		<h1>DateTimePicker</h1>
+
 		<form method="get">
 			{{ form }}
 		</form>

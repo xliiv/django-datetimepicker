@@ -101,8 +101,8 @@ The media is added [dynamically](https://docs.djangoproject.com/en/dev/topics/fo
 +    def media(self):
 +       form_media = forms.Media(js=[
 +           js_loader_url(
-+               field=self.fields['datetimepicker_without_script_tag'],
-+               input_id='id_datetimepicker_without_script_tag'
++               fields=self.fields,
++               input_ids=['id_datetimepicker_without_script_tag'],
 +           ),
 +       ])
 +       return super(SampleForm, self).media + form_media

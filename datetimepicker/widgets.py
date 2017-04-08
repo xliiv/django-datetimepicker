@@ -121,7 +121,6 @@ class DateTimePicker(DateTimeInput):
         )
 
         if self.use_script_tag:
-            # a dict represented in json is equivalent to an object in javascript
             js_options = json.dumps(dict(
                 format=_py_datetime_format_to_js(self.options.get('format')),
                 **{key: val

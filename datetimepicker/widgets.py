@@ -33,9 +33,11 @@ def _py_datetime_format_to_js(format_string):
 def _js_datetime_format_to_py(format_string):
     return (
         format_string is not None and
-        reduce(lambda format_string, args: format_string.replace(*args),
-               FORMAT_MAP.items(),
-               format_string) or
+        reduce(
+            lambda format_string, args: format_string.replace(*args),
+            FORMAT_MAP.items(),
+            format_string
+        ) or
         None
     )
 

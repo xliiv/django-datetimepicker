@@ -31,18 +31,12 @@ class SampleForm(forms.Form):
 
     @property
     def media(self):
-        form_media = forms.Media(js=[
-            js_loader_url(
-                field=self.fields['datepicker_no_script_tag'],
-                input_id='id_datepicker_no_script_tag'
-            ),
-            js_loader_url(
-                field=self.fields['timepicker_no_script_tag'],
-                input_id='id_timepicker_no_script_tag'
-            ),
-            js_loader_url(
-                field=self.fields['datetimepicker_no_script_tag'],
-                input_id='id_datetimepicker_no_script_tag'
-            ),
-        ])
+        js_urls = js_loader_url(
+            fields=self.fields,
+            input_ids=['datepicker_no_script_tag',
+                       'timepicker_no_script_tag',
+                       'datetimepicker_no_script_tag']
+        )
+
+        form_media = forms.Media(js=js_urls)
         return super(SampleForm, self).media + form_media

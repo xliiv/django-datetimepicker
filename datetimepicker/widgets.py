@@ -100,7 +100,11 @@ class DateTimePicker(DateTimeInput):
         if value is None:
             value = ''
 
-        input_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+        input_attrs = self.build_attrs(attrs)
+        input_attrs.update({
+            'name': name,
+            'type': self.input_type,
+        })
 
         if value != '':
             input_attrs.update({

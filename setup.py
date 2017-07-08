@@ -13,7 +13,7 @@ setup(
                                      'static/datetimepicker/js/*.js',
                                      'static/datetimepicker/vendor/js/jquery.min.js']},
     include_package_data=True,
-    version='3.0',
+    version='3.1',
     description='Datetimepicker for Django projects.',
     long_description=long_description,
     author='Pablo Escodebar',

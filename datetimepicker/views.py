@@ -8,10 +8,6 @@ from .widgets import _py_datetime_format_to_js
 OPTION_KEYS = ('format', 'datepicker', 'timepicker', 'language')
 
 
-def _options_valid(options):
-    return True
-
-
 class OptionParser:
 
     @staticmethod
@@ -55,8 +51,6 @@ class JSTemplateView(TemplateView):
             if key in self.request.GET
         }
 
-        if not _options_valid(options):
-            raise RuntimeError('Invalid parameters')
         if len(options):
             context.update({'options': json.dumps(options)})
 

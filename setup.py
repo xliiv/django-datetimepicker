@@ -9,9 +9,16 @@ except (IOError, ImportError):
 setup(
     name='django-datetimepicker',
     packages=['datetimepicker',],
-    package_data={'datetimepicker': ['static/datetimepicker/css/*.css',
-                                     'static/datetimepicker/js/*.js',
-                                     'static/datetimepicker/vendor/js/jquery.min.js']},
+    package_data={
+        'datetimepicker': [
+            'static/datetimepicker/css/*.css',
+            'static/datetimepicker/js/*.js',
+            'static/datetimepicker/vendor/js/jquery.min.js'
+            'templates/datetimepicker/div.html',
+            'templates/datetimepicker/loader.js',
+            'templates/datetimepicker/script.html',
+            ]
+    },
     include_package_data=True,
     version='3.0',
     description='Datetimepicker for Django projects.',

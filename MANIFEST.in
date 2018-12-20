@@ -1,3 +1,4 @@
 include LICENSE
-include README.rst
-recursive-include bootstrap3_datetime *.js *.css *.html
+include README.md
+recursive-include datetimepicker/static *.*
+recursive-include datetimepicker/templates/datetimepicker *.*

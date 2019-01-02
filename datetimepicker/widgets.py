@@ -104,6 +104,7 @@ class DateTimePicker(DateTimeInput):
         context = self.get_context(name, value, attrs)
         input_attrs = context['widget']['attrs']
         input_attrs.update({
+            'name': name,
             'value': context['widget']['value'],
             'type': context['widget']['type'],
         })

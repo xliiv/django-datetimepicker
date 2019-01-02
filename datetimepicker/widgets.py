@@ -95,24 +95,18 @@ class DateTimePicker(DateTimeInput):
 
         super(DateTimePicker, self).__init__(attrs, format_string)
 
+    def format_value(self, value):
+        return super().format_value(value) or ''
+
     def render(
         self, name, value, attrs=None, renderer=None, prefix='datetimepicker'
     ):
-
-        if value is None:
-            value = ''
-
-        input_attrs = self.build_attrs(attrs)
+        context = self.get_context(name, value, attrs)
+        input_attrs = context['widget']['attrs']
         input_attrs.update({
-            'name': name,
-            'type': self.input_type,
+            'value': context['widget']['value'],
+            'type': context['widget']['type'],
         })
-
-        if value != '':
-            input_attrs.update({
-                'value': force_text(self.format_value(value))
-            })
-
         self.div_attrs.update({
             'id': '{prefix}_{field_id}'.format(
                 prefix=prefix,

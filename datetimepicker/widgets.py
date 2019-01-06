@@ -87,7 +87,6 @@ class DateTimePicker(DateTimeInput):
         # as the 'format' keyword argument
         if format_string:
             options.update({'format': format_string})
-        options.update({'language': translation.get_language()})
 
         self.options = options
         self.div_attrs = div_attrs
@@ -133,6 +132,11 @@ class DateTimePicker(DateTimeInput):
                 context={
                     'input_attrs': input_attrs,
                     'options': js_options,
+                    # datetimepicker Plugin now handles lang globally
+                    # (instead of previous via widget-initialization)
+                    'lang': self.options.pop(
+                        'lang', translation.get_language()
+                    ),
                 }
             )
             rendered += js
